@@ -93,7 +93,7 @@ const BrowseJobs = () => {
 
   return (
     <div className="max-w-7xl mx-auto mt-4">
-      {/* Search and Filterss */}
+      {/* Search and Filters */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
         <form onSubmit={handleSearch} className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
