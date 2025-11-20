@@ -9,6 +9,9 @@ const ProtectedRoute = ({ children, userType }) => {
   }
 
   if (userType && user.userType !== userType) {
+    if (userType == 'admin') {
+      return <Navigate to="/admin/login" replace />;
+    }
     return <Navigate to="/" replace />;
   }
 
