@@ -19,21 +19,25 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser({
-        id: payload.sub,
-        userType: payload.user_type
-      });
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUser({
+          id: payload.sub,
+          userType: payload.user_type
+        });
+      } catch (error) {
+        console.error('Invalid token:', error);
+        logout();
+      }
     }
     setLoading(false);
   }, [token]);
 
-  const login = async (email, password, userType) => {
+  const login = async (email, password) => {
     try {
       const response = await axios.post('http://localhost:8000/api/v1/auth/login', {
         email,
-        password,
-        user_type: userType
+        password
       });
 
       const { access_token, refresh_token, user_id, user_type } = response.data;
@@ -47,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         userType: user_type
       });
 
-      return { success: true };
+      return { success: true, userType: user_type };
     } catch (error) {
       return { 
         success: false, 
@@ -61,6 +65,8 @@ export const AuthProvider = ({ children }) => {
       const endpoint = userType === 'user' 
         ? '/auth/register/user' 
         : '/auth/register/employer';
+      
+      console.log('Sending registration data:', userData); // Debug log
       
       const response = await axios.post(
         `http://localhost:8000/api/v1${endpoint}`,
@@ -78,8 +84,9 @@ export const AuthProvider = ({ children }) => {
         userType: user_type
       });
 
-      return { success: true };
+      return { success: true, userType: user_type };
     } catch (error) {
+      console.error('Registration error:', error.response?.data); // Detailed error log
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Registration failed' 

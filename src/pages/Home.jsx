@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Users, TrendingUp, Star, Clock, DollarSign } from 'lucide-react';
 import { jobsAPI } from '../services/api';
@@ -77,7 +77,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Top Section */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -180,9 +180,9 @@ const Home = () => {
                   className="bg-white p-6 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                    <h2 className="font-semibold text-gray-900 group-hover:text-blue-600">
                       {category}
-                    </h3>
+                    </h2>
                     <div className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium">
                       {Math.floor(Math.random() * 200) + 50} jobs
                     </div>

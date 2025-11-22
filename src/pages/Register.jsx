@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { jobsAPI } from '../services/api';
 
 const Register = () => {
-  const [userType, setUserType] = useState('user');
+  const location = useLocation();
+  const [userType, setUserType] = useState(location.state?.userType || 'user');
+  const [districts, setDistricts] = useState([]);
   const [formData, setFormData] = useState({
-    // common fields
+    // Common fields
     firstName: '',
     lastName: '',
     phoneNumber: '',
@@ -14,17 +17,43 @@ const Register = () => {
     confirmPassword: '',
     district: '',
     
-    // for seekers only
+    // User specific
     dateOfBirth: '',
     
-    // employers only
+    // Employer specific
     companyName: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [districtsLoading, setDistrictsLoading] = useState(true);
 
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  // Update form when userType changes
+  useEffect(() => {
+    loadDistricts();
+
+    if (userType === 'user') {
+      setFormData(prev => ({ ...prev, companyName: '' }));
+    } else {
+      setFormData(prev => ({ ...prev, dateOfBirth: '' }));
+    }
+  }, [userType]);
+
+  // load districts
+  const loadDistricts = async () => {
+    try {
+      setDistrictsLoading(true);
+      const response = await jobsAPI.getDistricts();
+      setDistricts(response.data);
+    } catch (error) {
+      console.error('Error loading districts:', error);
+      setError('Failed to load districts');
+    } finally {
+      setDistrictsLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -44,12 +73,31 @@ const Register = () => {
 
     setLoading(true);
 
-    const { confirmPassword, ...submitData } = formData;
-    
+    const submitData = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      phone_number: formData.phoneNumber,
+      email: formData.email,
+      password: formData.password,
+      district: formData.district
+    };
+
+    if (userType === 'user') {
+      submitData.date_of_birth = formData.dateOfBirth;
+    } else {
+      submitData.company_name = formData.companyName;
+      if (!formData.firstName) delete submitData.first_name;
+      if (!formData.lastName) delete submitData.last_name;
+    }
+
     const result = await register(submitData, userType);
     
     if (result.success) {
-      navigate(userType === 'employer' ? '/employer/dashboard' : '/jobs');
+      if (result.userType === 'employer') {
+        navigate('/employer/dashboard');
+      } else {
+        navigate('/jobs');
+      }
     } else {
       setError(result.error);
     }
@@ -58,7 +106,7 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-4">
+    <div className="max-w-md mx-auto mt-4 bg-white p-8 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold text-center mb-6">Join KaziNiKazi</h2>
       
       {error && (
@@ -101,27 +149,27 @@ const Register = () => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              First Name
+              First Name {userType === 'user' && '*'}
             </label>
             <input
               type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              required
+              required={userType === 'user'}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
+              Last Name {userType === 'user' && '*'}
             </label>
             <input
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              required
+              required={userType === 'user'}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -130,7 +178,7 @@ const Register = () => {
         {userType === 'employer' && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Company Name
+              Company Name *
             </label>
             <input
               type="text"
@@ -174,7 +222,7 @@ const Register = () => {
         {userType === 'user' && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date of Birth
+              Date of Birth *
             </label>
             <input
               type="date"
@@ -191,18 +239,26 @@ const Register = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             District
           </label>
-          <select
-            name="district"
-            value={formData.district}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select District</option>
-            <option value="Gasabo">Gasabo</option>
-            <option value="Kicukiro">Kicukiro</option>
-            <option value="Nyarugenge">Nyarugenge</option>
-          </select>
+          {districtsLoading ? (
+            <div className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 animate-pulse text-gray-500">
+              Loading districts...
+            </div>
+          ) : (
+            <select
+              name="district"
+              value={formData.district}
+              onChange={handleChange}
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select District</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div>

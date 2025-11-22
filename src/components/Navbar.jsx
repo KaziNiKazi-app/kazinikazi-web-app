@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Briefcase, User } from 'lucide-react';
+import { Briefcase, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
@@ -30,19 +30,38 @@ const Navbar = () => {
             <Link to="/jobs" className="text-gray-600 hover:text-blue-600">
               Browse Jobs
             </Link>
+            {isAuthenticated && user.userType === 'user' && (
+              <>
+                <Link to="/my-applications" className="text-gray-600 hover:text-blue-600">
+                  My Applications
+                </Link>
+                <Link to="/work-tracking" className="text-gray-600 hover:text-blue-600">
+                  Work Tracking
+                </Link>
+                <Link to="/profile" className="flex items-center text-gray-600 hover:text-blue-600">
+                  <User className="h-4 w-4 mr-1" />
+                  Profile
+                </Link>
+              </>
+            )}
             
             {isAuthenticated ? (
               <>
                 {user.userType === 'employer' && (
-                  <Link to="/employer/dashboard" className="text-gray-600 hover:text-blue-600">
-                    Dashboard
-                  </Link>
+                  <>
+                    <Link to="/employer/dashboard" className="text-gray-600 hover:text-blue-600">
+                      Dashboard
+                    </Link>
+                    <Link to="/employer/work-tracking" className="text-gray-600 hover:text-blue-600">
+                      Work Sessions
+                    </Link>
+                    <Link to="/employer/profile" className="flex items-center text-gray-600 hover:text-blue-600">
+                      <User className="h-4 w-4 mr-1" />
+                      Profile
+                    </Link>
+                  </>
                 )}
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-600 flex items-center">
-                    <User className="h-4 w-4 mr-1" />
-                    {user.userType}
-                  </span>
                   <button
                     onClick={handleLogout}
                     className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
