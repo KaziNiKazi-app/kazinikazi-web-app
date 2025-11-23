@@ -98,32 +98,32 @@ const EmployerProfile = () => {
                 Company Name *
               </label>
               <input
-OB                type="text"
+                type="text"
                 name="company_name"
-OBOB                value={profile.company_name || ''}
+                value={profile.company_name || ''}
                 onChange={handleChange}
-OB                required
+                required
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-OB                placeholder="Enter your company name"
-OB              />
+                placeholder="Enter your company name"
+              />
             </div>
           </div>
 
           {/* Personal Information */}
-OBOB          <div className="border-b border-gray-200 pb-6">
+          <div className="border-b border-gray-200 pb-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <User className="h-5 w-5 mr-2" />
               Contact Person
-OBOB            </h2>
-OBOBOB            
+            </h2>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-OB                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   First Name
                 </label>
                 <input
                   type="text"
-OA                  name="first_name"
+                  name="first_name"
                   value={profile.first_name || ''}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
